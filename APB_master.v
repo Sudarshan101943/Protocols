@@ -47,8 +47,8 @@ module apb_master (
    
 
   reg [1:0]state;
-
-   
+  reg [7:0] W_adress;
+  reg [7:0] R_adress;
    
     always @(posedge clk , negedge rst)
      begin
@@ -100,8 +100,8 @@ module apb_master (
             W_SETUP: begin
                 psel <= 1;
                 penable <= 0;
-                pwrite <= 0;
-                paddr <= apb_write_addr;
+                pwrite <= 1;
+                W_adress <= apb_write_addr;
                 pwdata <= apb_write_data;
                 state <= ENABLE;
             end
@@ -110,14 +110,14 @@ module apb_master (
                 psel <= 1;
                 penable <= 0;
                 pwrite <= 0;
-                paddr <= apb_read_addr;
+                R_adress <= apb_read_addr;
                 state <= ENABLE;
             end
 
             ENABLE: begin
                 psel <= 1;
                 penable <= 1;
-                paddr <= pwrite ? apb_write_addr : apb_read_addr;
+                paddr <= pwrite ? W_adress : R_adress;
                 pwdata <= apb_write_data;
 
                 if (pready) begin
